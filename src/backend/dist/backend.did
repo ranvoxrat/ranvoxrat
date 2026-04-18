@@ -1,0 +1,237 @@
+type http_request_result = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type http_header = 
+ record {
+   name: text;
+   value: text;
+ };
+type _ImmutableObjectStorageRefillResult = 
+ record {
+   success: opt bool;
+   topped_up_amount: opt nat;
+ };
+type _ImmutableObjectStorageRefillInformation = record {
+                                                  proposed_top_up_amount:
+                                                   opt nat;};
+type _ImmutableObjectStorageCreateCertificateResult = 
+ record {
+   blob_hash: text;
+   method: text;
+ };
+type UserRole__1 = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserRole = 
+ variant {
+   admin;
+   student;
+   teacher;
+ };
+type UserProfile = 
+ record {
+   createdAt: Timestamp;
+   email: text;
+   name: text;
+   role: UserRole;
+ };
+type UserId = principal;
+type TransformationOutput = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type TransformationInput = 
+ record {
+   context: blob;
+   response: http_request_result;
+ };
+type Timestamp = int;
+type SubmissionStatus = 
+ variant {
+   graded;
+   grading;
+   submitted;
+ };
+type SubmissionId = nat;
+type Submission = 
+ record {
+   aiFeedback: vec QuestionFeedback;
+   aiScore: opt float64;
+   examId: ExamId;
+   fileRef: opt ExternalBlob;
+   status: SubmissionStatus;
+   studentId: UserId;
+   submissionId: SubmissionId;
+   submittedAt: Timestamp;
+   textAnswers: vec AnswerEntry;
+ };
+type ResultId = nat;
+type Result = 
+ record {
+   finalScore: float64;
+   gradedAt: Timestamp;
+   overriddenBy: opt UserId;
+   resultId: ResultId;
+   submissionId: SubmissionId;
+   teacherRemarks: text;
+ };
+type QuestionType = 
+ variant {
+   essay;
+   multipleChoice;
+   shortAnswer;
+ };
+type QuestionId = nat;
+type QuestionFeedback = 
+ record {
+   feedback: text;
+   questionId: QuestionId;
+   score: float64;
+ };
+type Question = 
+ record {
+   correctAnswer: opt text;
+   options: vec text;
+   pointValue: nat;
+   questionId: QuestionId;
+   questionType: QuestionType;
+   "text": text;
+ };
+type PerformanceRecord = 
+ record {
+   examId: ExamId;
+   examTitle: text;
+   finalScore: opt float64;
+   submittedAt: Timestamp;
+ };
+type LogId = nat;
+type ExternalBlob = blob;
+type ExamStatus = 
+ variant {
+   closed;
+   draft;
+   published;
+ };
+type ExamId = nat;
+type Exam = 
+ record {
+   answerKeyRef: opt ExternalBlob;
+   classId: ClassId;
+   createdAt: Timestamp;
+   description: text;
+   durationMinutes: opt nat;
+   examId: ExamId;
+   questions: vec Question;
+   rubricRef: opt ExternalBlob;
+   scheduledAt: opt Timestamp;
+   status: ExamStatus;
+   teacherId: UserId;
+   title: text;
+ };
+type DashboardStats = 
+ record {
+   activeExams: nat;
+   pendingSubmissions: nat;
+   recentActivityCount: nat;
+   totalAdmins: nat;
+   totalStudents: nat;
+   totalTeachers: nat;
+ };
+type ClassId = nat;
+type ClassAnalytics = 
+ record {
+   averageScore: float64;
+   examCount: nat;
+   failingStudents: vec record {
+                          UserId;
+                          float64;
+                        };
+   submissionCount: nat;
+   topStudents: vec record {
+                      UserId;
+                      float64;
+                    };
+ };
+type Class = 
+ record {
+   classId: ClassId;
+   createdAt: Timestamp;
+   name: text;
+   studentIds: vec UserId;
+   teacherId: UserId;
+ };
+type AnswerEntry = 
+ record {
+   questionId: QuestionId;
+   "text": text;
+ };
+type ActivityLog = 
+ record {
+   action: text;
+   actorId: UserId;
+   actorName: text;
+   details: text;
+   logId: LogId;
+   timestamp: Timestamp;
+ };
+service : {
+  _immutableObjectStorageBlobsAreLive: (hashes: vec blob) -> (vec bool) query;
+  _immutableObjectStorageBlobsToDelete: () -> (vec blob) query;
+  _immutableObjectStorageConfirmBlobDeletion: (blobs: vec blob) -> ();
+  _immutableObjectStorageCreateCertificate: (blobHash: text) ->
+   (_ImmutableObjectStorageCreateCertificateResult);
+  _immutableObjectStorageRefillCashier: (refillInformation:
+   opt _ImmutableObjectStorageRefillInformation) ->
+   (_ImmutableObjectStorageRefillResult);
+  _immutableObjectStorageUpdateGatewayPrincipals: () -> ();
+  _initializeAccessControl: () -> ();
+  assignCallerUserRole: (user: principal, role: UserRole__1) -> ();
+  createClass: (name: text) -> (Class);
+  createExam: (title: text, description: text, classId: ClassId, questions:
+   vec Question, scheduledAt: opt Timestamp, durationMinutes: opt nat) ->
+   (Exam);
+  getActivityLogs: () -> (vec ActivityLog) query;
+  getAssignedExams: () -> (vec Exam) query;
+  getCallerUserProfile: () -> (opt UserProfile) query;
+  getCallerUserRole: () -> (UserRole__1) query;
+  getClassAnalytics: (classId: ClassId) -> (ClassAnalytics) query;
+  getClasses: () -> (vec Class) query;
+  getDashboardStats: () -> (DashboardStats) query;
+  getExamDetail: (examId: ExamId) -> (opt Exam) query;
+  getExams: () -> (vec Exam) query;
+  getMySubmissions: () -> (vec Submission) query;
+  getPerformanceHistory: () -> (vec PerformanceRecord) query;
+  getSubmissionResult: (submissionId: SubmissionId) -> (opt Result) query;
+  getSubmissions: (examId: ExamId) -> (vec Submission) query;
+  getUserProfile: (user: UserId) -> (opt UserProfile) query;
+  getUsers: () -> (vec record {
+                         UserId;
+                         UserProfile;
+                       }) query;
+  inviteUser: (targetPrincipal: UserId, name: text, email: text, role:
+   UserRole) -> ();
+  isCallerAdmin: () -> (bool) query;
+  overrideScore: (submissionId: SubmissionId, finalScore: float64,
+   teacherRemarks: text) -> ();
+  publishExam: (examId: ExamId) -> ();
+  resetUserPassword: (targetPrincipal: UserId) -> (text);
+  saveCallerUserProfile: (name: text, email: text) -> ();
+  setOpenAIKey: (key: text) -> ();
+  submitExam: (examId: ExamId, textAnswers: vec AnswerEntry, fileRef:
+   opt ExternalBlob) -> (Submission);
+  transform: (input: TransformationInput) -> (TransformationOutput) query;
+  triggerAIGrading: (submissionId: SubmissionId) -> ();
+  updateClass: (classId: ClassId, name: text) -> ();
+  updateExam: (examId: ExamId, title: text, description: text, questions:
+   vec Question, answerKeyRef: opt ExternalBlob, rubricRef: opt ExternalBlob,
+   scheduledAt: opt Timestamp, durationMinutes: opt nat) -> ();
+  updateUserRole: (targetPrincipal: UserId, role: UserRole) -> ();
+}

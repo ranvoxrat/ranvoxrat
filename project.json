@@ -1,0 +1,23 @@
+{
+  "overview": "AI-powered examination management platform with role-based access for administrators, teachers, and students. Teachers create exams with a question builder, upload answer keys and rubrics, and review AI-generated grades. Students submit answers and view personalized feedback. Admins manage users and monitor system analytics.",
+  "features": [
+    "Role-based access: admin, teacher, student dashboards",
+    "Exam creation with question builder (multiple choice + essay)",
+    "AI grading engine via OpenAI integration",
+    "File uploads for answer keys, rubrics, and student submissions",
+    "Teacher score override and grade export",
+    "Student performance history and per-question feedback",
+    "Admin user management and activity logs",
+    "Class management and analytics charts"
+  ],
+  "category": "productivity",
+  "tags": [
+    "education",
+    "ai",
+    "grading",
+    "exams",
+    "role-based-access",
+    "analytics"
+  ],
+  "last_updated": "2026-04-18T15:38:31.358Z"
+}

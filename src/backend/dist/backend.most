@@ -1,0 +1,149 @@
+// Version: 1.0.0
+type ActivityLog__24839845 =
+  {
+    action : Text;
+    actorId : UserId__158757552;
+    actorName : Text;
+    details : Text;
+    logId : LogId__472453763;
+    timestamp : Timestamp__301639476
+  };
+type AnswerEntry__501321927 =
+  {questionId : QuestionId__77764146; text : Text};
+type ClassId__805055241 = Nat;
+type Class__199118982 =
+  {
+    classId : ClassId__805055241;
+    createdAt : Timestamp__301639476;
+    name : Text;
+    studentIds : [UserId__158757552];
+    teacherId : UserId__158757552
+  };
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type ExamId__379139927 = Nat;
+type ExamStatus__169416769 = {#closed; #draft; #published};
+type Exam__947290883 =
+  {
+    answerKeyRef : ?ExternalBlob__246066408;
+    classId : ClassId__805055241;
+    createdAt : Timestamp__301639476;
+    description : Text;
+    durationMinutes : ?Nat;
+    examId : ExamId__379139927;
+    questions : [Question__254691067];
+    rubricRef : ?ExternalBlob__246066408;
+    scheduledAt : ?Timestamp__301639476;
+    status : ExamStatus__169416769;
+    teacherId : UserId__158757552;
+    title : Text
+  };
+type ExternalBlob__246066408 = Blob;
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type LogId__472453763 = Nat;
+type Map__158565046<K, V> = Map__297112838<K, V>;
+type Map__297112838<K, V> =
+  {var root : Node__46230540<K, V>; var size : Nat__490723111};
+type Map__605269027<K, V> = Map__158565046<K, V>;
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type QuestionFeedback__384536873 =
+  {feedback : Text; questionId : QuestionId__77764146; score : Float};
+type QuestionId__77764146 = Nat;
+type QuestionType__1071592355 = {#essay; #multipleChoice; #shortAnswer};
+type Question__254691067 =
+  {
+    correctAnswer : ?Text;
+    options : [Text];
+    pointValue : Nat;
+    questionId : QuestionId__77764146;
+    questionType : QuestionType__1071592355;
+    text : Text
+  };
+type ResultId__980923967 = Nat;
+type Result__952663513 =
+  {
+    finalScore : Float;
+    gradedAt : Timestamp__301639476;
+    overriddenBy : ?UserId__158757552;
+    resultId : ResultId__980923967;
+    submissionId : SubmissionId__741433157;
+    teacherRemarks : Text
+  };
+type SubmissionId__741433157 = Nat;
+type SubmissionStatus__403064977 = {#graded; #grading; #submitted};
+type Submission__406789549 =
+  {
+    aiFeedback : [QuestionFeedback__384536873];
+    aiScore : ?Float;
+    examId : ExamId__379139927;
+    fileRef : ?ExternalBlob__246066408;
+    status : SubmissionStatus__403064977;
+    studentId : UserId__158757552;
+    submissionId : SubmissionId__741433157;
+    submittedAt : Timestamp__301639476;
+    textAnswers : [AnswerEntry__501321927]
+  };
+type Timestamp__301639476 = Int;
+type UserId__158757552 = Principal;
+type UserProfile__277265826 =
+  {
+    createdAt : Timestamp__301639476;
+    email : Text;
+    name : Text;
+    role : UserRole__451090586
+  };
+type UserRole__1054455867 = {#admin; #guest; #user};
+type UserRole__451090586 = {#admin; #student; #teacher};
+actor {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__605269027<Principal, UserRole__1054455867>
+    };
+  stable activityLogs :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?ActivityLog__24839845]];
+      var elementIndex : Nat__490723111
+    };
+  stable classes :
+    {
+      var root : Node__46230540<ClassId__805055241, Class__199118982>;
+      var size : Nat__490723111
+    };
+  stable counters :
+    {
+      var nextClassId : Nat;
+      var nextExamId : Nat;
+      var nextLogId : Nat;
+      var nextResultId : Nat;
+      var nextSubmissionId : Nat
+    };
+  stable exams :
+    {
+      var root : Node__46230540<ExamId__379139927, Exam__947290883>;
+      var size : Nat__490723111
+    };
+  stable openAIKey : {var value : Text};
+  stable results :
+    {
+      var root : Node__46230540<ResultId__980923967, Result__952663513>;
+      var size : Nat__490723111
+    };
+  stable submissions :
+    {
+      var root :
+        Node__46230540<SubmissionId__741433157, Submission__406789549>;
+      var size : Nat__490723111
+    };
+  stable users :
+    {
+      var root : Node__46230540<UserId__158757552, UserProfile__277265826>;
+      var size : Nat__490723111
+    }
+};
